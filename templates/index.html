@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if session.user_id %}
+    <div class="form-box">
+      <h2>Add New Photo Entry</h2>
+      <form action="" method="post" enctype="multipart/form-data">
+        <div>
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+          <label for="description">Description:</label>
+          <textarea id="description" name="description"></textarea>
+        </div>
+        <div>
+          <label for="image">Photo:</label>
+          <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <div>
+          <button type="submit">Add Entry</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="entries">
+      <h2>Your Entries</h2>
+      {% for entry in entries %}
+        <div class="entry">
+          <img src="{{ url_for('static', filename=entry.image_path) }}" alt="{{ entry.title }}">
+          <h3>{{ entry.title }}</h3>
+          <p>{{ entry.description }}</p>
+          <p class="date">{{ entry.created_at }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
