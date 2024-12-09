@@ -7,10 +7,32 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.png') }}">
     <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="/manifest.json">
+    <script>
+    // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.error('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+</script>
+
 </head>
 <body>
     <div class="header">
         <h1>Photo Journal</h1>
+        {%if session.user_id%}
+    <div>
+        Hello, {{ session.username }}
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+    </div>
+    {% endif %}
     </div>
     <div class="main">
         {% with messages = get_flashed_messages(with_categories=true) %}

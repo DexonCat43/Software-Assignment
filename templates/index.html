@@ -1,38 +1,81 @@
 {% extends "base.html" %}
-
 {% block content %}
-  {% if session.user_id %}
-    <div class="form-box">
-      <h2>Add New Photo Entry</h2>
-      <form action="" method="post" enctype="multipart/form-data">
-        <div>
-          <label for="title">Title:</label>
-          <input type="text" id="title" name="title" required>
-        </div>
-        <div>
-          <label for="description">Description:</label>
-          <textarea id="description" name="description"></textarea>
-        </div>
-        <div>
-          <label for="image">Photo:</label>
-          <input type="file" id="image" name="image" accept="image/*" required>
-        </div>
-        <div>
-          <button type="submit">Add Entry</button>
-        </div>
-      </form>
+{% if session.user_id %}
+
+<form action="{{ url_for('add_entry') }}" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
     </div>
 
-    <div class="entries">
-      <h2>Your Entries</h2>
-      {% for entry in entries %}
-        <div class="entry">
-          <img src="{{ url_for('static', filename=entry.image_path) }}" alt="{{ entry.title }}">
-          <h3>{{ entry.title }}</h3>
-          <p>{{ entry.description }}</p>
-          <p class="date">{{ entry.created_at }}</p>
-        </div>
-      {% endfor %}
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
     </div>
-  {% endif %}
+
+    <div>
+        <label for="image">Photo:</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+    </div>
+
+    <button type="submit">Add Entry</button>
+</form>
+
+{% for entry in entries %}
+
+    <img src="{{ url_for('static', filename=entry.image_path) }}" alt="{{ entry.title }}">
+
+    <!-- Normal display view -->
+    <div id="display-{{ entry.id }}">
+        <h3>{{ entry.title }}</h3>
+        <p>{{ entry.description }}</p>
+        <div class="entry-footer">
+            <span class="date">{{ entry.created_at }}</span>
+            <div class="entry-actions">
+                <button class="icon-button" onclick="showEditForm('{{ entry.id }}')" title="Edit entry">
+                    <img src="{{ url_for('static', filename='icons/icon-edit-64x64.png') }}" alt="Edit" class="icon">
+                </button>
+                <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="post" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                    <button type="submit" class="icon-button" title="Delete entry">
+                        <img src="{{ url_for('static', filename='icons/icon-delete-64x64.png') }}" alt="Delete" class="icon">
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit form (hidden by default) -->
+    <div id="edit-{{ entry.id }}" style="display: none;">
+        <form action="{{ url_for('edit_entry', entry_id=entry.id) }}" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="edit-title-{{ entry.id }}">Title:</label>
+                <input type="text" id="edit-title-{{ entry.id }}" name="title" value="{{ entry.title }}" required>
+            </div>
+            <div>
+                <label for="edit-description-{{ entry.id }}">Description:</label>
+                <textarea id="edit-description-{{ entry.id }}" name="description" required>{{ entry.description }}</textarea>
+            </div>
+            <div>
+                <label for="edit-image-{{ entry.id }}">New Photo (optional):</label>
+                <input type="file" id="edit-image-{{ entry.id }}" name="image" accept="image/*">
+            </div>
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="hideEditForm('{{ entry.id }}')">Cancel</button>
+        </form>
+    </div>
+
+{% endfor %}
+
+<script>
+function showEditForm(entryId) {
+    document.getElementById(`display-${entryId}`).style.display = 'none';
+    document.getElementById(`edit-${entryId}`).style.display = 'block';
+}
+
+function hideEditForm(entryId) {
+    document.getElementById(`display-${entryId}`).style.display = 'block';
+    document.getElementById(`edit-${entryId}`).style.display = 'none';
+}
+</script>
+{% endif %}
 {% endblock %}
