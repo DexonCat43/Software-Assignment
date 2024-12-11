@@ -1,20 +1,18 @@
-//service-worker.js
-const CACHE_NAME = 'photo-journal-cache-v1';
+const CACHE_NAME = 'movie-review-cache-v1';
 const urlsToCache = [
-    '/',
-    '/static/style.css',
-    '/static/uploads/',
-    '/register',
-    '/login',
-    '/offline',
-    '/static/icons/icon-192x192.png',
-    '/static/icons/icon-512x512.png',
-    '/static/icons/icon-delete-64x64.png',
-    '/static/icons/icon-edit-64x64.png',
-    '/static/icons/favicon.png',
-    '/manifest.json'
-  ]
-  
+  '/',
+  '/static/style.css',
+  '/static/uploads/',
+  '/register',
+  '/login',
+  '/offline',
+  '/static/icons/icon-192x192.png',
+  '/static/icons/icon-512x512.png',
+  '/static/icons/icon-delete-64x64.png',
+  '/static/icons/icon-edit-64x64.png',
+  '/static/icons/favicon.png',
+  '/manifest.json'
+];
 
 // Helper function for debugging
 const debug = (message) => {

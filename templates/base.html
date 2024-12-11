@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Journal</title>
+    <title>Movie Review</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='icons/favicon.png') }}">
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="/manifest.json">
     <script>
-    // Register service worker
+        // Register service worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -21,18 +21,17 @@
                     });
             });
         }
-</script>
-
+    </script>
 </head>
 <body>
     <div class="header">
-        <h1>Photo Journal</h1>
-        {%if session.user_id%}
-    <div>
-        Hello, {{ session.username }}
-        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
-    </div>
-    {% endif %}
+        <h1>Movie Central!</h1>
+        {% if session.user_id %}
+            <div>
+                Hello, {{ session.username }}
+                <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+            </div>
+        {% endif %}
     </div>
     <div class="main">
         {% with messages = get_flashed_messages(with_categories=true) %}

@@ -5,8 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
-
-# Initialise the Flask application
+# Initialize the Flask application
 app = Flask(__name__)
 app.secret_key = '123'
 
@@ -22,29 +21,24 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 def get_db():
-    db = sqlite3.connect('database/photo_journal.db')
+    db = sqlite3.connect('database/movie_reviews.db')
     db.row_factory = sqlite3.Row
     return db
 
 # Define the route for the homepage
 @app.route('/')
 def index():
-    # Check if the user is logged in by verifying the session
-    if 'user_id' not in session:
-        return redirect(url_for('login'))  # Redirect to the login page if not authenticated
-
     db = get_db()
-    entries = db.execute('''
-        SELECT * FROM entries
-        WHERE user_id =?
-        ORDER BY created_at DESC
-''', (session['user_id'],)).fetchall()
+    reviews = db.execute('''
+        SELECT reviews.*, users.username FROM reviews
+        JOIN users ON reviews.user_id = users.id
+        ORDER BY reviews.created_at DESC
+    ''').fetchall()
 
-    return render_template('index.html', entries=entries)
-# Define the route for login functionality, supporting GET and POST methods
+    return render_template('index.html', reviews=reviews)
 
+# Define the route for login functionality
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -52,21 +46,19 @@ def login():
         password = request.form['password']
 
         db = get_db()
-        user = db.execute(
-            'SELECT * FROM users WHERE username = ?', (username,)
-        ).fetchone()
+        user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
 
         if user and check_password_hash(user['password'], password):
             session.clear()
             session['user_id'] = user['id']
             session['username'] = user['username']
             return redirect(url_for('index'))
-        
+
         flash('Invalid username or password', 'error')
 
     return render_template('login.html')
 
-
+# Define the route for the register functionality
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -75,36 +67,37 @@ def register():
 
         db = get_db()
         try:
-            #try to insert the new user.
             db.execute(
                 'INSERT INTO users (username, password) VALUES (?, ?)',
                 (username, generate_password_hash(password))
             )
             db.commit()
-            flash('Registration successful! Please log in.', 'success') #message to display if successful.
+            flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('login'))
-        except sqlite3.IntegrityError: # catch the exception here.
-            flash('Username already exists!', 'error') #message to display if it failed.
+        except sqlite3.IntegrityError:
+            flash('Username already exists!', 'error')
 
     return render_template('register.html')
 
+#route for the logoout functionality
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-@app.route('/add_entry', methods=['POST'])
-def add_entry():
+#add review functionality
+@app.route('/add_review', methods=['POST'])
+def add_review():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    if 'image' not in request.files:
-        flash('No image uploaded', 'error')
+    if 'poster' not in request.files:
+        flash('No poster uploaded', 'error')
         return redirect(url_for('index'))
 
-    file = request.files['image']
+    file = request.files['poster']
     if file.filename == '':
-        flash('No image selected', 'error')
+        flash('No poster selected', 'error')
         return redirect(url_for('index'))
 
     if file and allowed_file(file.filename):
@@ -114,17 +107,18 @@ def add_entry():
 
         db = get_db()
         db.execute('''
-            INSERT INTO entries (user_id, title, description, image_path)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO reviews (user_id, movie_title, review, rating, poster_path)
+            VALUES (?, ?, ?, ?, ?)
         ''', (
             session['user_id'],
-            request.form['title'],
-            request.form['description'],
+            request.form['movie_title'],
+            request.form['review'],
+            request.form['rating'],
             f"uploads/{filename}"
         ))
         db.commit()
 
-        flash('Entry added successfully!', 'success')
+        flash('Review added successfully!', 'success')
     else:
         flash('Invalid file type', 'error')
 
@@ -154,97 +148,77 @@ def manifest():
     )
     return response
 
-@app.route('/edit_entry/<int:entry_id>', methods=['POST'])
-def edit_entry(entry_id):
+@app.route('/edit_review/<int:review_id>', methods=['POST'])
+def edit_review(review_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     db = get_db()
-    # First verify the entry belongs to the current user
-    entry = db.execute(
-        'SELECT * FROM entries WHERE id = ? AND user_id = ?',
-        (entry_id, session['user_id'])
+    review = db.execute(
+        'SELECT * FROM reviews WHERE id = ? AND user_id = ?',
+        (review_id, session['user_id'])
     ).fetchone()
 
-    if not entry:
-        flash('Entry not found or access denied', 'error')
+    if not review:
+        flash('Review not found or access denied', 'error')
         return redirect(url_for('index'))
 
-    # Update the title and description
-    title = request.form['title']
-    description = request.form['description']
+    movie_title = request.form['movie_title']
+    review_text = request.form['review']
+    rating = request.form['rating']
+    poster_path = review['poster_path']
 
-    # Check if a new image was uploaded
-    if 'image' in request.files and request.files['image'].filename != '':
-        file = request.files['image']
+    if 'poster' in request.files and request.files['poster'].filename != '':
+        file = request.files['poster']
         if allowed_file(file.filename):
-            # Delete the old image file
             try:
-                old_image_path = os.path.join(app.root_path, 'static', entry['image_path'])
-                if os.path.exists(old_image_path):
-                    os.remove(old_image_path)
+                old_poster_path = os.path.join(app.root_path, 'static', review['poster_path'])
+                if os.path.exists(old_poster_path):
+                    os.remove(old_poster_path)
             except Exception as e:
-                print(f"Error deleting old image: {e}")
+                print(f"Error deleting old poster: {e}")
 
-            # Save the new image
             filename = secure_filename(f"{datetime.now().timestamp()}_{file.filename}")
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
+            poster_path = f"uploads/{filename}"
 
-            # Update database with new image path
-            db.execute('''
-                UPDATE entries
-                SET title = ?, description = ?, image_path = ?
-                WHERE id = ? AND user_id = ?
-            ''', (title, description, f"uploads/{filename}", entry_id, session['user_id']))
-        else:
-            flash('Invalid file type', 'error')
-            return redirect(url_for('index'))
-    else:
-        # Update database without changing the image
-        db.execute('''
-            UPDATE entries
-            SET title = ?, description = ?
-            WHERE id = ? AND user_id = ?
-        ''', (title, description, entry_id, session['user_id']))
-
+    db.execute('''
+        UPDATE reviews
+        SET movie_title = ?, review = ?, rating = ?, poster_path = ?
+        WHERE id = ? AND user_id = ?
+    ''', (movie_title, review_text, rating, poster_path, review_id, session['user_id']))
     db.commit()
-    flash('Entry updated successfully!', 'success')
+    flash('Review updated successfully!', 'success')
     return redirect(url_for('index'))
 
-@app.route('/delete_entry/<int:entry_id>', methods=['POST'])
-def delete_entry(entry_id):
+#review delete route functionality 
+@app.route('/delete_review/<int:review_id>', methods=['POST'])
+def delete_review(review_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     db = get_db()
-    # First get the entry to find the image path
-    entry = db.execute(
-        'SELECT * FROM entries WHERE id = ? AND user_id = ?',
-        (entry_id, session['user_id'])
+    review = db.execute(
+        'SELECT * FROM reviews WHERE id = ? AND user_id = ?',
+        (review_id, session['user_id'])
     ).fetchone()
 
-    if not entry:
-        flash('Entry not found or access denied', 'error')
+    if not review:
+        flash('Review not found or access denied', 'error')
         return redirect(url_for('index'))
 
-    # Delete the image file
     try:
-        image_path = os.path.join(app.root_path, 'static', entry['image_path'])
-        if os.path.exists(image_path):
-            os.remove(image_path)
+        poster_path = os.path.join(app.root_path, 'static', review['poster_path'])
+        if os.path.exists(poster_path):
+            os.remove(poster_path)
     except Exception as e:
-        print(f"Error deleting image file: {e}")
+        print(f"Error deleting poster file: {e}")
 
-    # Delete the database entry
-    db.execute('DELETE FROM entries WHERE id = ? AND user_id = ?',
-               (entry_id, session['user_id']))
-
+    db.execute('DELETE FROM reviews WHERE id = ? AND user_id = ?', (review_id, session['user_id']))
     db.commit()
-    flash('Entry deleted successfully!', 'success')
+    flash('Review deleted successfully!', 'success')
     return redirect(url_for('index'))
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -2,79 +2,92 @@
 {% block content %}
 {% if session.user_id %}
 
-<form action="{{ url_for('add_entry') }}" method="post" enctype="multipart/form-data">
+<form action="{{ url_for('add_review') }}" method="post" enctype="multipart/form-data">
     <div>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
+        <label for="movie_title">Movie Title:</label>
+        <input type="text" id="movie_title" name="movie_title" required>
     </div>
 
     <div>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
+        <label for="review">Review:</label>
+        <textarea id="review" name="review" required></textarea>
     </div>
 
     <div>
-        <label for="image">Photo:</label>
-        <input type="file" id="image" name="image" accept="image/*" required>
+        <label for="rating">Rating:</label>
+        <input type="number" id="rating" name="rating" min="1" max="10" required>
     </div>
 
-    <button type="submit">Add Entry</button>
+    <div>
+        <label for="poster">Poster (optional):</label>
+        <input type="file" id="poster" name="poster" accept="image/*">
+    </div>
+
+    <button type="submit">Add Review</button>
 </form>
 
-{% for entry in entries %}
+{% for review in reviews %}
 
-    <img src="{{ url_for('static', filename=entry.image_path) }}" alt="{{ entry.title }}">
+    <img src="{{ url_for('static', filename=review.poster_path) }}" alt="{{ review.movie_title }}">
 
     <!-- Normal display view -->
-    <div id="display-{{ entry.id }}">
-        <h3>{{ entry.title }}</h3>
-        <p>{{ entry.description }}</p>
+    <div id="display-{{ review.id }}">
+        <h3>{{ review.movie_title }}</h3>
+        <p>By {{ review.username }}</p> <!-- Add username display -->
+        <p>{{ review.review }}</p>
+        <p>Rating: {{ review.rating }}/10</p>
         <div class="entry-footer">
-            <span class="date">{{ entry.created_at }}</span>
+            <span class="date">{{ review.created_at }}</span>
+            {% if session.user_id == review.user_id %}
             <div class="entry-actions">
-                <button class="icon-button" onclick="showEditForm('{{ entry.id }}')" title="Edit entry">
+                <button class="icon-button" onclick="showEditForm('{{ review.id }}')" title="Edit review">
                     <img src="{{ url_for('static', filename='icons/icon-edit-64x64.png') }}" alt="Edit" class="icon">
                 </button>
-                <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="post" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                    <button type="submit" class="icon-button" title="Delete entry">
+                <form action="{{ url_for('delete_review', review_id=review.id) }}" method="post" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                    <button type="submit" class="icon-button" title="Delete review">
                         <img src="{{ url_for('static', filename='icons/icon-delete-64x64.png') }}" alt="Delete" class="icon">
                     </button>
                 </form>
             </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Edit form (hidden by default) -->
-    <div id="edit-{{ entry.id }}" style="display: none;">
-        <form action="{{ url_for('edit_entry', entry_id=entry.id) }}" method="post" enctype="multipart/form-data">
+    <div id="edit-{{ review.id }}" style="display: none;">
+        <form action="{{ url_for('edit_review', review_id=review.id) }}" method="post" enctype="multipart/form-data">
             <div>
-                <label for="edit-title-{{ entry.id }}">Title:</label>
-                <input type="text" id="edit-title-{{ entry.id }}" name="title" value="{{ entry.title }}" required>
+                <label for="edit-movie_title-{{ review.id }}">Movie Title:</label>
+                <input type="text" id="edit-movie_title-{{ review.id }}" name="movie_title" value="{{ review.movie_title }}" required>
             </div>
             <div>
-                <label for="edit-description-{{ entry.id }}">Description:</label>
-                <textarea id="edit-description-{{ entry.id }}" name="description" required>{{ entry.description }}</textarea>
+                <label for="edit-review-{{ review.id }}">Review:</label>
+                <textarea id="edit-review-{{ review.id }}" name="review" required>{{ review.review }}</textarea>
             </div>
             <div>
-                <label for="edit-image-{{ entry.id }}">New Photo (optional):</label>
-                <input type="file" id="edit-image-{{ entry.id }}" name="image" accept="image/*">
+                <label for="edit-rating-{{ review.id }}">Rating:</label>
+                <input type="number" id="edit-rating-{{ review.id }}" name="rating" value="{{ review.rating }}" min="1" max="10" required>
+            </div>
+            <div>
+                <label for="edit-poster-{{ review.id }}">New Poster (optional):</label>
+                <input type="file" id="edit-poster-{{ review.id }}" name="poster" accept="image/*">
             </div>
             <button type="submit">Save Changes</button>
-            <button type="button" onclick="hideEditForm('{{ entry.id }}')">Cancel</button>
+            <button type="button" onclick="hideEditForm('{{ review.id }}')">Cancel</button>
         </form>
     </div>
 
 {% endfor %}
 
 <script>
-function showEditForm(entryId) {
-    document.getElementById(`display-${entryId}`).style.display = 'none';
-    document.getElementById(`edit-${entryId}`).style.display = 'block';
+function showEditForm(reviewId) {
+    document.getElementById(`display-${reviewId}`).style.display = 'none';
+    document.getElementById(`edit-${reviewId}`).style.display = 'block';
 }
 
-function hideEditForm(entryId) {
-    document.getElementById(`display-${entryId}`).style.display = 'block';
-    document.getElementById(`edit-${entryId}`).style.display = 'none';
+function hideEditForm(reviewId) {
+    document.getElementById(`display-${reviewId}`).style.display = 'block';
+    document.getElementById(`edit-${reviewId}`).style.display = 'none';
 }
 </script>
 {% endif %}

@@ -21,49 +21,49 @@ body {
     text-decoration: none;   /* Remove the underline from the link */
     padding: 8px 15px;   /* Add padding inside the button */
     border-radius: 3px;   /* Slightly round the corners of the button */
-    }
+}
     
-    /* Main content area */
-    .main {
-        width: 800px;   /* Set a fixed width for the main content area */
-        margin: 0 auto;   /* Centre the content on the page */
-        padding: 20px;   /* Add padding inside the main content area */
-    }
+/* Main content area */
+.main {
+    width: 800px;   /* Set a fixed width for the main content area */
+    margin: 0 auto;   /* Centre the content on the page */
+    padding: 20px;   /* Add padding inside the main content area */
+}
     
-    /* Basic form styling */
-    * {
-        box-sizing: border-box;   /* Include padding and border in element's total width and height */
-    }
+/* Basic form styling */
+* {
+    box-sizing: border-box;   /* Include padding and border in element's total width and height */
+}
     
-    .form-box {
-        background-color: white;   /* White background for the form box */
-        padding: 20px;   /* Add padding inside the form box */
-        margin-bottom: 20px;   /* Add space below the form box */
-        width: 500px;   /* Set a fixed width for the form */
-        margin: 0 auto;   /* Centre the form box on the page */
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);   /* Adds a shadow for better visibility */
-    }
+.form-box {
+    background-color: white;   /* White background for the form box */
+    padding: 20px;   /* Add padding inside the form box */
+    margin-bottom: 20px;   /* Add space below the form box */
+    width: 500px;   /* Set a fixed width for the form */
+    margin: 0 auto;   /* Centre the form box on the page */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);   /* Adds a shadow for better visibility */
+}
     
-    label {
-        display: block;   /* Make the label take up the full width */
-        margin-top: 10px;   /* Add space above the label */
-    }
+label {
+    display: block;   /* Make the label take up the full width */
+    margin-top: 10px;   /* Add space above the label */
+}
     
-    input, textarea, button {
-        width: 100%;   /* Make form elements take the full width of the parent container */
-        margin-bottom: 10px;   /* Add space below each form element */
-        padding: 5px;   /* Add padding inside the form elements */
-    }
+input, textarea, button {
+    width: 100%;   /* Make form elements take the full width of the parent container */
+    margin-bottom: 10px;   /* Add space below each form element */
+    padding: 5px;   /* Add padding inside the form elements */
+}
 
-    button {
-        background-color: #4287f5;  /* Blue background for the button */
-        color: white;              /* White text for contrast */
-        padding: 10px;             /* Add padding inside the button */
-        border: none;              /* Remove the default border */
-        margin-top: 10px;          /* Add space above the button */
-    }
+button {
+    background-color: #4287f5;  /* Blue background for the button */
+    color: white;              /* White text for contrast */
+    padding: 10px;             /* Add padding inside the button */
+    border: none;              /* Remove the default border */
+    margin-top: 10px;          /* Add space above the button */
+}
     
-    /* Auth section (e.g., login/signup form) */
+/* Auth section (e.g., login/signup form) */
 .auth {
     text-align: center;    /* Centre the text */
 }
@@ -94,11 +94,11 @@ body {
     border: 1px solid #f5c6cb;    /* Light red border for error messages */
 }
 
-/* Entry display (e.g., blog or feed entries) */
+/* Review display (e.g., movie reviews) */
 .entry {
-    background-color: white;    /* White background for each entry */
-    padding: 20px;    /* Add padding inside the entry */
-    margin-bottom: 20px;    /* Add space below each entry */
+    background-color: white;    /* White background for each review */
+    padding: 20px;    /* Add padding inside the review */
+    margin-bottom: 20px;    /* Add space below each review */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);    /* Adds a shadow for better visibility */
 }
 
@@ -118,15 +118,15 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
-  }
-  
-  .entry-actions {
+}
+
+.entry-actions {
     display: flex;
     gap: 8px;
     align-items: center;
-  }
-  
-  .icon-button {
+}
+
+.icon-button {
     background: none;
     border: none;
     padding: 4px;
@@ -134,9 +134,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .icon-button:hover {
+}
+
+.icon-button:hover {
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 4px;
 }

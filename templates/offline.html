@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>You are offline</h2>
-    <p>Check your internet connection and try again to see updated content.</p>
+    <div class="offline-message">
+        <h2>You are offline</h2>
+        <p>Sorry, you can't post or edit reviews while offline. However, you can still read your existing reviews.</p>
+    </div>
 {% endblock %}
