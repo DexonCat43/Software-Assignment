@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
 {% if session.user_id %}
 
@@ -27,7 +28,6 @@
 </form>
 
 {% for review in reviews %}
-
     <img src="{{ url_for('static', filename=review.poster_path) }}" alt="{{ review.movie_title }}">
 
     <!-- Normal display view -->
@@ -76,7 +76,6 @@
             <button type="button" onclick="hideEditForm('{{ review.id }}')">Cancel</button>
         </form>
     </div>
-
 {% endfor %}
 
 <script>
