@@ -6,6 +6,4 @@ SETUP:
 in the vscode searchbar ">terminal" and create new terminal
 in the vscode searchbar ">python: create new environment"
 in the terminal " pip install flask "
-
-Install SQLite3
-You will need to create a file : movie_reviews.db
+Install SQLite3 extention
